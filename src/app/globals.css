@@ -1,24 +1,27 @@
 @import "tailwindcss";
 
-/* FUNBOX design tokens. One written reason per token (R-31), full list in
-   status/agent-02.md.
-   Palette rule (R-29): neutral base (bg / surface / line / ink / ink-dim) plus
-   four toy accents. The accents are not page decoration: each toy carries
-   exactly one, used on its card and its stage header, so six cards read as six
-   different toys instead of one card copied six times (R-14). */
+/* FUNBOX design tokens. Reasons in status/agent-02.md (R-31).
+   Theme: LIGHT page, white tiles (human instruction 22:06, supersedes the dark
+   base). Every value below is measured with the anti-slop contrast script, never
+   recalled: ink 18.52:1, ink-dim 7.35:1, accents 6.32:1 to 6.95:1 on white.
+   Palette rule (R-29): neutral base (bg, surface, line, ink, ink-dim, ring) plus
+   four toy accents. Each toy carries exactly one accent, on its own tile and its
+   own stage header, so six tiles read as six toys (R-14). */
 :root {
-  --bg: #14120f; /* warm near-black, so the 1998 toys sit on paper and not on void */
-  --surface: #1e1b17; /* one step up from --bg: hierarchy without shadows (R-12) */
-  --line: #3a342c;
-  --ink: #f7f3ec; /* 16.90:1 on --bg */
-  --ink-dim: #b6ada0; /* 7.74:1 on --surface */
-  --accent-blue: #7cc4ff; /* 9.15:1 on --surface */
-  --accent-pink: #ff8fc7; /* 8.17:1 on --surface */
-  --accent-lime: #b8e986; /* 12.28:1 on --surface */
-  --accent-amber: #ffc46b; /* 10.91:1 on --surface */
-  --radius: 10px; /* surfaces */
+  --bg: #ffffff; /* the page is paper now */
+  --surface: #ffffff; /* tiles are paper too: the tile is defined by its hairline and its glyph */
+  --line: #e4dfd7; /* 1.33:1 on white. Decorative hairline: grouping, never text, never the only cue */
+  --ink: #16130f; /* 18.52:1 on white */
+  --ink-dim: #5c554b; /* 7.35:1 on white */
+  --ring: #16130f; /* focus ring, 18.52:1 on white and on tile white */
+  --accent-blue: #1d5fa8; /* 6.45:1 on white */
+  --accent-pink: #a3246b; /* 6.95:1 on white */
+  --accent-lime: #3f6b12; /* 6.32:1 on white */
+  --accent-amber: #8a5300; /* 6.33:1 on white */
+  --radius: 15px; /* tiles */
   --radius-sm: 6px; /* controls. Two radii, no pills (R-11) */
-  --toy: var(--accent-amber); /* accent of the toy in focus, set per card and per stage */
+  --shadow-tile: 0 6px 18px rgb(22 19 15 / 0.14); /* soft, hover only: elevation as the hover cue (R-12) */
+  --toy: var(--accent-amber); /* accent of the toy in focus; each tile and stage sets its own */
 }
 
 @theme inline {
@@ -30,62 +33,73 @@
 }
 
 html {
-  color-scheme: dark; /* dark is the content's choice: full-screen toy takeovers, an ASCII modem log, sparkle trails */
+  color-scheme: light;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; /* system stack: the brief bans asset files, and next/font would fetch at build */
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; /* system stack: the brief bans asset files, and next/font fetches at build */
   -webkit-font-smoothing: antialiased;
 }
 
-/* Visible focus ring on every control, never removed (R-32). --toy on --bg is 11.90:1. */
+/* Focus ring on every control, never removed (R-32). --ring on white is 18.52:1,
+   and on a white tile the same, so it stays visible wherever it lands. */
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
-  outline: 3px solid var(--toy);
+  outline: 3px solid var(--ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* ---------- toy card ---------- */
+/* ---------- the tile wall ---------- */
+.toy-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  grid-auto-rows: 107px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .toy-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   width: 100%;
   height: 100%;
-  min-height: 140px;
-  padding: 18px 18px 16px;
+  padding: 14px 16px;
+  overflow: hidden;
   text-align: left;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  transition: transform 120ms ease, border-color 120ms ease;
+  /* The snap: 70ms linear, transform and shadow only, so it never fights reading. */
+  transition: transform 70ms linear, box-shadow 70ms linear, border-color 70ms linear;
 }
 .toy-card:hover {
+  transform: scale(1.023);
+  box-shadow: var(--shadow-tile);
   border-color: var(--toy);
-  transform: translateY(-2px); /* the only motion on the grid: it says "this is a button" (R-19) */
 }
-.toy-card__bar {
-  width: 34px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--toy);
+.toy-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toy-card__glyph {
+  font-size: 1.25rem;
+  line-height: 1;
 }
 .toy-card__title {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 .toy-card__blurb {
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.45;
   color: var(--ink-dim);
-}
-.toy-card__open {
-  margin-top: auto;
-  font-size: 0.75rem;
-  color: var(--toy);
 }
 
 /* ---------- stage ---------- */
@@ -96,7 +110,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  border-top: 3px solid var(--toy);
+  border-top: 4px solid var(--toy);
 }
 .toy-stage__bar {
   display: flex;
@@ -132,10 +146,6 @@ body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-}
-.toy-pending {
-  padding: 32px 16px;
-  color: var(--ink-dim);
 }
 
 /* ---------- cursor-chaos ---------- */
@@ -189,11 +199,11 @@ body {
   background: var(--toy);
   border: 1px solid var(--toy);
   border-radius: var(--radius-sm);
-  transition: transform 180ms ease;
+  transition: transform 70ms linear;
 }
 
 /* One global respect for the OS setting (brief: reduced motion disables trail,
-   marquee, shake). Also stops the marquee for anyone who asked for stillness. */
+   marquee, shake). The tile transform is dropped entirely, not just shortened. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -205,5 +215,9 @@ body {
   .toy-card:hover,
   .cc-run {
     transform: none !important;
+  }
+  .toy-card:hover {
+    box-shadow: none !important; /* the shadow is the hover cue for the transform it lost */
+    border-color: var(--toy) !important;
   }
 }

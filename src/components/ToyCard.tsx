@@ -2,7 +2,6 @@
 
 import type { CSSProperties } from "react";
 import type { Toy } from "@/toys";
-import { shell } from "@/content/footer";
 
 export default function ToyCard({
   toy,
@@ -18,10 +17,15 @@ export default function ToyCard({
       style={{ "--toy": `var(--accent-${toy.accent})` } as CSSProperties}
       onClick={(e) => onOpen(toy.slug, e.currentTarget)}
     >
-      <span className="toy-card__bar" aria-hidden="true" />
-      <span className="toy-card__title">{toy.title}</span>
-      <span className="toy-card__blurb">{toy.blurb}</span>
-      <span className="toy-card__open">{shell.cardHint}</span>
+      <span className="toy-card__top">
+        {/* Decorative: the title below is the accessible name, so the glyph is
+            hidden from assistive tech rather than read out as "cookie". */}
+        <span className="toy-card__glyph" aria-hidden="true">
+          {toy.glyph}
+        </span>
+        <span className="toy-card__title">{toy.title}</span>
+      </span>
+      <span className="toy-card__blurb line-clamp-2">{toy.blurb}</span>
     </button>
   );
 }

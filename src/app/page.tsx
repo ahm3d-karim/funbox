@@ -36,7 +36,7 @@ export default function Home() {
       ) : (
         <>
           <p className="mb-4 text-sm text-ink-dim">{shell.cardHint}</p>
-          <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="toy-grid">
             {toys.map((toy) => (
               <li key={toy.slug}>
                 <ToyCard toy={toy} onOpen={start} />
