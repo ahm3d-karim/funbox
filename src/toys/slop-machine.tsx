@@ -2,15 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { dialectLabels, dialects, slopUi } from "@/content/slop";
+import {
+  dialectLabels,
+  dialects,
+  slopMarkers,
+  slopScoreUi,
+  slopTiers,
+  slopUi,
+  worstSentence,
+} from "@/content/slop";
 import { slopify } from "@/lib/engine";
 
 const MAX = 300;
 
-// House tokens only (agent-02 owns globals.css): --bg/--surface/--line/--ink/--ink-dim
-// and --toy, which the stage sets to this toy's accent (pink). Focus rings come from
-// the global :focus-visible rule, so no per-element outline classes here.
-// Radii: --radius-sm for controls, --radius for panels (no pills, R-11).
+// The score is derived from `input` during render, on purpose: no state, no effect,
+// no debounce, so it moves on every keystroke and cannot drift out of sync with the
+// box. Same rule as content/slop.ts documents: each marker present adds its weight,
+// capped at 100, higher is worse.
 
 type Result = { key: string; label: string; tagline: string; text: string };
 
@@ -21,6 +29,14 @@ function results(text: string): Result[] {
     tagline: dialectLabels[dialect].tagline,
     text: slopify(text, dialect),
   }));
+}
+
+function scoreOf(text: string) {
+  const haystack = text.toLowerCase();
+  const fired = slopMarkers.filter((marker) => haystack.includes(marker.term));
+  const score = Math.min(100, fired.reduce((sum, marker) => sum + marker.weight, 0));
+  const tier = slopTiers.find((entry) => score >= entry.min && score <= entry.max) ?? slopTiers[0];
+  return { fired, score, tier };
 }
 
 export default function SlopMachine() {
@@ -36,6 +52,8 @@ export default function SlopMachine() {
     },
     [],
   );
+
+  const { fired, score, tier } = scoreOf(input);
 
   function run() {
     const text = input.trim();
@@ -92,6 +110,19 @@ export default function SlopMachine() {
             {out ? slopUi.buttonAgain : slopUi.button}
           </button>
 
+          <button
+            className="min-h-11 rounded-[var(--radius-sm)] border border-line px-3 py-2 text-sm text-ink"
+            onClick={() => {
+              setInput(worstSentence);
+              setError("");
+              setOut(results(worstSentence));
+            }}
+            title={slopScoreUi.worstHint}
+            type="button"
+          >
+            {slopScoreUi.worst}
+          </button>
+
           <span className="text-xs text-ink-dim">{slopUi.example}</span>
           {slopUi.examples.map((example) => (
             <button
@@ -118,6 +149,40 @@ export default function SlopMachine() {
           </p>
         ) : null}
       </form>
+
+      <section className="flex flex-col gap-2 rounded-[var(--radius)] border border-line bg-surface p-3">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h3 className="text-sm font-semibold text-ink">{slopScoreUi.label}</h3>
+          <p className="font-mono text-2xl text-[color:var(--toy)]">
+            {score}
+            <span className="text-sm text-ink-dim"> {slopScoreUi.of}</span>
+          </p>
+          <p className="text-xs text-ink-dim">{slopScoreUi.higher}</p>
+        </div>
+
+        <div className="h-2 w-full rounded-full bg-line">
+          <div className="h-2 rounded-full bg-[var(--toy)]" style={{ width: `${score}%` }} />
+        </div>
+
+        <p className="text-sm text-ink">
+          {tier.label} <span className="text-ink-dim">{tier.line}</span>
+        </p>
+
+        <p className="text-xs uppercase tracking-wide text-ink-dim">{slopScoreUi.firing}</p>
+        {fired.length > 0 ? (
+          <ul className="flex flex-wrap gap-1.5">
+            {fired.map((marker) => (
+              <li className="rounded-[var(--radius-sm)] border border-line px-2 py-0.5 font-mono text-xs text-ink-dim" key={marker.term}>
+                {marker.term} +{marker.weight}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-ink-dim">{slopScoreUi.clean}</p>
+        )}
+
+        <p className="text-xs text-ink-dim">{slopScoreUi.note}</p>
+      </section>
 
       <section aria-live="polite" className="grid gap-3 md:grid-cols-3">
         {out
