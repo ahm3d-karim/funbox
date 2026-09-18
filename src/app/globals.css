@@ -239,6 +239,17 @@ body {
     transform: translateY(18px);
   }
 }
+/* the pen: the box the runaway button is allowed to move inside. Its border is
+   the honest hint that there is a bounded area here. */
+.cc-pen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  margin-top: 16px;
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-sm);
+}
 .cc-run {
   min-height: 44px;
   padding: 10px 18px;
@@ -260,9 +271,12 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
-  .toy-card:hover,
-  .cc-run {
+  .toy-card:hover {
     transform: none !important;
+  }
+  /* the runaway button still moves under reduced motion, it just jumps: no slide */
+  .cc-run {
+    transition: none !important;
   }
   .toy-card:hover {
     box-shadow: none !important; /* the gold hairline took over as the hover cue */
