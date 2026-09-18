@@ -1,26 +1,209 @@
 @import "tailwindcss";
 
+/* FUNBOX design tokens. One written reason per token (R-31), full list in
+   status/agent-02.md.
+   Palette rule (R-29): neutral base (bg / surface / line / ink / ink-dim) plus
+   four toy accents. The accents are not page decoration: each toy carries
+   exactly one, used on its card and its stage header, so six cards read as six
+   different toys instead of one card copied six times (R-14). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #14120f; /* warm near-black, so the 1998 toys sit on paper and not on void */
+  --surface: #1e1b17; /* one step up from --bg: hierarchy without shadows (R-12) */
+  --line: #3a342c;
+  --ink: #f7f3ec; /* 16.90:1 on --bg */
+  --ink-dim: #b6ada0; /* 7.74:1 on --surface */
+  --accent-blue: #7cc4ff; /* 9.15:1 on --surface */
+  --accent-pink: #ff8fc7; /* 8.17:1 on --surface */
+  --accent-lime: #b8e986; /* 12.28:1 on --surface */
+  --accent-amber: #ffc46b; /* 10.91:1 on --surface */
+  --radius: 10px; /* surfaces */
+  --radius-sm: 6px; /* controls. Two radii, no pills (R-11) */
+  --toy: var(--accent-amber); /* accent of the toy in focus, set per card and per stage */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark; /* dark is the content's choice: full-screen toy takeovers, an ASCII modem log, sparkle trails */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; /* system stack: the brief bans asset files, and next/font would fetch at build */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus ring on every control, never removed (R-32). --toy on --bg is 11.90:1. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--toy);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- toy card ---------- */
+.toy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  padding: 18px 18px 16px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+.toy-card:hover {
+  border-color: var(--toy);
+  transform: translateY(-2px); /* the only motion on the grid: it says "this is a button" (R-19) */
+}
+.toy-card__bar {
+  width: 34px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--toy);
+}
+.toy-card__title {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.toy-card__blurb {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+.toy-card__open {
+  margin-top: auto;
+  font-size: 0.75rem;
+  color: var(--toy);
+}
+
+/* ---------- stage ---------- */
+.toy-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-top: 3px solid var(--toy);
+}
+.toy-stage__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.toy-stage__title {
+  font-size: 1rem;
+  font-weight: 650;
+}
+.toy-stage__blurb {
+  font-size: 0.8125rem;
+  color: var(--ink-dim);
+}
+.toy-stage__close {
+  min-height: 44px; /* tap target floor (R-03) */
+  padding: 10px 18px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.toy-stage__close:hover {
+  border-color: var(--toy);
+}
+.toy-stage__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.toy-pending {
+  padding: 32px 16px;
+  color: var(--ink-dim);
+}
+
+/* ---------- cursor-chaos ---------- */
+.cc-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--surface);
+  border-top: 1px dashed var(--line);
+  border-bottom: 1px dashed var(--line);
+}
+.cc-marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  color: var(--toy);
+  animation: cc-scroll 14s linear infinite;
+}
+.cc-marquee span.cc-paused {
+  animation-play-state: paused;
+}
+@keyframes cc-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+.cc-sparkle {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  font-size: 14px;
+  color: var(--toy);
+  animation: cc-fade 700ms linear forwards;
+}
+@keyframes cc-fade {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+.cc-run {
+  min-height: 44px;
+  padding: 10px 18px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--toy);
+  border: 1px solid var(--toy);
+  border-radius: var(--radius-sm);
+  transition: transform 180ms ease;
+}
+
+/* One global respect for the OS setting (brief: reduced motion disables trail,
+   marquee, shake). Also stops the marquee for anyone who asked for stillness. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .toy-card:hover,
+  .cc-run {
+    transform: none !important;
+  }
 }
