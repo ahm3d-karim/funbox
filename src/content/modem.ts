@@ -52,3 +52,36 @@ export const karaokeUi = {
   totalLabel: "run time",
   sourceNote: "Tones are approximations of the published tone plans. Verify at the source; the real handshake varies by modem.",
 };
+
+// ---------- the keypad ----------
+//
+// DTMF is the one part of this toy that is NOT an approximation: a key press sends
+// two exact frequencies, one from the low group and one from the high group.
+//   [S3] DTMF frequency pairs and the 4x3 layout (ITU-T Q.23):
+//        https://en.wikipedia.org/wiki/Precise_tone_plan   (checked 2026-09-18)
+//   [S4] ITU-T Q.23, "Technical features of push-button telephone sets":
+//        https://www.itu.int/rec/T-REC-Q.23   (checked 2026-09-18)
+// The pairs are therefore derived from the row/column indices, not typed by hand.
+
+export const dtmfLow = [697, 770, 852, 941]; // rows 1-2-3, 4-5-6, 7-8-9, *-0-#
+export const dtmfHigh = [1209, 1336, 1477]; // columns 1-4-7-*, 2-5-8-0, 3-6-9-#
+
+export const dialKeyOrder = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"];
+
+export const dialKeys = dialKeyOrder.map((key, i) => ({
+  key,
+  tones: [dtmfLow[Math.floor(i / 3)], dtmfHigh[i % 3]],
+}));
+
+export const dialPadUi = {
+  label: "Dial pad",
+  numberLabel: "Number",
+  empty: "no number yet",
+  hint: "Press a key to hear its two real DTMF frequencies, then Connect to dial it and start the handshake.",
+  dialling: "dialling",
+  connect: "Connect",
+  backspace: "Delete",
+  clear: "Clear",
+  keyHint: "Each press sends the real two-frequency pair for that key",
+  capNote: "Twelve digits is enough for a demo, and enough for the bill.",
+};
