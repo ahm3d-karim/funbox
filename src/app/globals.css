@@ -1,27 +1,38 @@
 @import "tailwindcss";
 
-/* FUNBOX design tokens. Reasons in status/agent-02.md (R-31).
-   Theme: LIGHT page, white tiles (human instruction 22:06, supersedes the dark
-   base). Every value below is measured with the anti-slop contrast script, never
-   recalled: ink 18.52:1, ink-dim 7.35:1, accents 6.32:1 to 6.95:1 on white.
-   Palette rule (R-29): neutral base (bg, surface, line, ink, ink-dim, ring) plus
-   four toy accents. Each toy carries exactly one accent, on its own tile and its
-   own stage header, so six tiles read as six toys (R-14). */
+/* FUNBOX chrome, LRS navy + gold.
+   Palette taken from LRS' own stylesheet, not invented:
+   Website/lrs-'26/httpdocs/css/style.css in Documents/Projects/Active/LUMS-SOCIETIES/LRS
+   (base #0b101b, card #131c2d, elevated #162032, gold #c5a059, gold-light #e5c97b,
+   gold-dark #9a781d, emerald #10b981, text #f8fafc, muted #cbd5e1, and their
+   hairline tokens --border-subtle rgba(255,255,255,.08) / --border-card
+   rgba(255,255,255,.1) / --border-gold rgba(197,160,89,.3) /
+   --border-gold-hover rgba(197,160,89,.6)).
+   Every text pair below is measured with the anti-slop contrast script, never
+   recalled. Ratios on the base #0b101b: text 18.18:1, muted 12.81:1, gold
+   7.74:1, gold-light 11.75:1, gold-dark 4.60:1. On the card #131c2d: text
+   16.30:1, muted 11.48:1, gold 6.94:1. */
 :root {
-  --bg: #ffffff; /* the page is paper now */
-  --surface: #ffffff; /* tiles are paper too: the tile is defined by its hairline and its glyph */
-  --line: #e4dfd7; /* 1.33:1 on white. Decorative hairline: grouping, never text, never the only cue */
-  --ink: #16130f; /* 18.52:1 on white */
-  --ink-dim: #5c554b; /* 7.35:1 on white */
-  --ring: #16130f; /* focus ring, 18.52:1 on white and on tile white */
-  --accent-blue: #1d5fa8; /* 6.45:1 on white */
-  --accent-pink: #a3246b; /* 6.95:1 on white */
-  --accent-lime: #3f6b12; /* 6.32:1 on white */
-  --accent-amber: #8a5300; /* 6.33:1 on white */
+  --bg: #0b101b; /* navy base, LRS */
+  --surface: #131c2d; /* card, LRS */
+  --line: rgb(255 255 255 / 0.1); /* LRS --border-card */
+  --hairline: rgb(255 255 255 / 0.08); /* LRS --border-subtle */
+  --border-gold: rgb(197 160 89 / 0.3); /* LRS --border-gold */
+  --border-gold-hover: rgb(197 160 89 / 0.6); /* LRS --border-gold-hover */
+  --ink: #f8fafc; /* 18.18:1 on base, 16.30:1 on card */
+  --ink-dim: #cbd5e1; /* 12.81:1 on base, 11.48:1 on card */
+  --gold: #c5a059; /* 7.74:1 on base, 6.94:1 on card */
+  --gold-light: #e5c97b; /* 11.75:1 on base */
+  --gold-dark: #9a781d; /* 4.60:1 on base */
+  --ring: #c5a059; /* gold focus ring: 7.74:1 on base, 6.94:1 on card, both >= 3:1 non-text */
+  --accent-blue: #7cc4ff;
+  --accent-pink: #ff8fc7;
+  --accent-lime: #b8e986;
+  --accent-amber: #ffc46b;
   --radius: 15px; /* tiles */
   --radius-sm: 6px; /* controls. Two radii, no pills (R-11) */
-  --shadow-tile: 0 6px 18px rgb(22 19 15 / 0.14); /* soft, hover only: elevation as the hover cue (R-12) */
-  --toy: var(--accent-amber); /* accent of the toy in focus; each tile and stage sets its own */
+  --shadow-tile: 0 6px 18px rgb(3 6 12 / 0.55);
+  --toy: var(--gold); /* accent of the toy in focus; each tile and stage sets its own */
 }
 
 @theme inline {
@@ -33,7 +44,7 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
@@ -43,12 +54,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Focus ring on every control, never removed (R-32). --ring on white is 18.52:1,
-   and on a white tile the same, so it stays visible wherever it lands. */
+/* Focus ring on every control, never removed (R-32). Gold on navy is 7.74:1. */
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* the wordmark: vector only, 28px tall, geometric mark + FUNBOX */
+.wordmark {
+  display: block;
+  height: 28px;
+  width: auto;
 }
 
 /* ---------- the tile wall ---------- */
@@ -62,17 +79,20 @@ body {
   margin: 0;
 }
 
+/* No art. The tile is deliberate on three things only: the gold hairline, the
+   small gold index numeral, and the title. Art (ToyArt) is an upgrade, never a
+   requirement, and a tile must never read as an empty box. */
 .toy-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   width: 100%;
   height: 100%;
-  padding: 14px 16px;
+  padding: 12px 16px;
   overflow: hidden;
   text-align: left;
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-gold);
   border-radius: var(--radius);
   /* The snap: 70ms linear, transform and shadow only, so it never fights reading. */
   transition: transform 70ms linear, box-shadow 70ms linear, border-color 70ms linear;
@@ -80,16 +100,25 @@ body {
 .toy-card:hover {
   transform: scale(1.023);
   box-shadow: var(--shadow-tile);
-  border-color: var(--toy);
+  border-color: var(--border-gold-hover);
 }
 .toy-card__top {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-.toy-card__glyph {
-  font-size: 1.25rem;
-  line-height: 1;
+.toy-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.toy-card__index {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
 }
 .toy-card__title {
   font-size: 1rem;
@@ -102,13 +131,27 @@ body {
   color: var(--ink-dim);
 }
 
-/* ---------- stage ---------- */
+/* ---------- stage ----------
+   The stage redefines the tokens for everything inside it, so the six frozen
+   toys read the navy palette without a single toy edit. It keeps its own ink:
+   without that, text inside inherits from the page and can go invisible. */
 .toy-stage {
+  --bg: #0b101b;
+  --surface: #131c2d;
+  --line: rgb(255 255 255 / 0.1);
+  --ink: #f8fafc;
+  --ink-dim: #cbd5e1;
+  --ring: #c5a059;
+  --accent-blue: #7cc4ff;
+  --accent-pink: #ff8fc7;
+  --accent-lime: #b8e986;
+  --accent-amber: #ffc46b;
   position: fixed;
   inset: 0;
   z-index: 50;
   display: flex;
   flex-direction: column;
+  color: var(--ink);
   background: var(--bg);
   border-top: 4px solid var(--toy);
 }
@@ -136,11 +179,11 @@ body {
   font-weight: 600;
   color: var(--ink);
   background: transparent;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-gold);
   border-radius: var(--radius-sm);
 }
 .toy-stage__close:hover {
-  border-color: var(--toy);
+  border-color: var(--border-gold-hover);
 }
 .toy-stage__body {
   flex: 1;
@@ -148,18 +191,23 @@ body {
   overflow-y: auto;
 }
 
+.toy-art {
+  flex: none;
+  color: var(--gold); /* agent-01's motifs are currentColor, drawn for 40px */
+}
+
 /* ---------- cursor-chaos ---------- */
 .cc-marquee {
   overflow: hidden;
   white-space: nowrap;
   background: var(--surface);
-  border-top: 1px dashed var(--line);
-  border-bottom: 1px dashed var(--line);
+  border-top: 1px dashed var(--hairline);
+  border-bottom: 1px dashed var(--hairline);
 }
 .cc-marquee span {
   display: inline-block;
   padding-left: 100%;
-  color: var(--toy);
+  color: var(--gold);
   animation: cc-scroll 14s linear infinite;
 }
 .cc-marquee span.cc-paused {
@@ -178,7 +226,7 @@ body {
   z-index: 60;
   pointer-events: none;
   font-size: 14px;
-  color: var(--toy);
+  color: var(--gold-light);
   animation: cc-fade 700ms linear forwards;
 }
 @keyframes cc-fade {
@@ -217,7 +265,7 @@ body {
     transform: none !important;
   }
   .toy-card:hover {
-    box-shadow: none !important; /* the shadow is the hover cue for the transform it lost */
-    border-color: var(--toy) !important;
+    box-shadow: none !important; /* the gold hairline took over as the hover cue */
+    border-color: var(--border-gold-hover) !important;
   }
 }

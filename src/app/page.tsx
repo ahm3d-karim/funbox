@@ -26,7 +26,30 @@ export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
       <header className="py-12 sm:py-16">
-        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">{shell.title}</h1>
+        <h1>
+          <svg
+            className="wordmark"
+            viewBox="0 0 220 36"
+            aria-hidden="true"
+            focusable="false"
+            role="presentation"
+          >
+            {/* hand-authored, vector only: a gold lozenge with a solid gold core */}
+            <path d="M18 3 L33 18 L18 33 L3 18 Z" fill="none" stroke="var(--gold)" strokeWidth="2" />
+            <path d="M18 11.5 L24.5 18 L18 24.5 L11.5 18 Z" fill="var(--gold)" />
+            <text
+              x="46"
+              y="27"
+              fontSize="28"
+              fontWeight="700"
+              letterSpacing="3.5"
+              fill="var(--ink)"
+            >
+              FUNBOX
+            </text>
+          </svg>
+          <span className="sr-only">{shell.title}</span>
+        </h1>
         <p className="mt-3 max-w-xl text-lg text-ink-dim">{shell.tagline}</p>
       </header>
 
@@ -37,9 +60,9 @@ export default function Home() {
         <>
           <p className="mb-4 text-sm text-ink-dim">{shell.cardHint}</p>
           <ul className="toy-grid">
-            {toys.map((toy) => (
+            {toys.map((toy, i) => (
               <li key={toy.slug}>
-                <ToyCard toy={toy} onOpen={start} />
+                <ToyCard toy={toy} index={i} onOpen={start} />
               </li>
             ))}
           </ul>

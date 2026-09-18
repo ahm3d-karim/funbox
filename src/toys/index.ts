@@ -11,7 +11,6 @@ export type Toy = {
   title: string; // card title, sentence case
   blurb: string; // <= 70 chars, no em dashes
   accent: "blue" | "pink" | "lime" | "amber"; // token name, not a hex
-  glyph: string; // decorative emoji, aria-hidden in the UI: the title is the name
   Component: ComponentType;
 };
 
@@ -19,16 +18,14 @@ export type Toy = {
 // Accent purpose: each toy owns one accent, so the grid reads as six toys
 // instead of one tile copied six times, and the accent follows the toy into its
 // own stage (R-14, R-29).
-// Glyph purpose: one emoji per tile, chosen for what that toy actually is, not
-// for decoration. All six are aria-hidden, so they never enter the accessible
-// name.
+// No art in the registry: the tile shows a gold hairline and a gold index
+// numeral built from array order, so deleting the emoji left nothing to redraw.
 export const toys: Toy[] = [
   {
     slug: "every-website",
     title: "Every website",
     blurb: "A page that drowns in its own popups, then cleans up.",
     accent: "blue",
-    glyph: "🍪",
     Component: EveryWebsite,
   },
   {
@@ -36,7 +33,6 @@ export const toys: Toy[] = [
     title: "Not a robot",
     blurb: "A captcha that takes itself very seriously.",
     accent: "pink",
-    glyph: "🤖",
     Component: NotARobot,
   },
   {
@@ -44,7 +40,6 @@ export const toys: Toy[] = [
     title: "Cursor chaos",
     blurb: "1998 called. Your cursor answered.",
     accent: "lime",
-    glyph: "✨",
     Component: CursorChaos,
   },
   {
@@ -52,7 +47,6 @@ export const toys: Toy[] = [
     title: "Guestbook",
     blurb: "Sign it. Entries stay in your browser, as it says.",
     accent: "amber",
-    glyph: "✍️",
     Component: Guestbook,
   },
   {
@@ -60,7 +54,6 @@ export const toys: Toy[] = [
     title: "Dial-up karaoke",
     blurb: "Sing along with a modem handshake made of code.",
     accent: "blue",
-    glyph: "☎️",
     Component: DialupKaraoke,
   },
   {
@@ -68,7 +61,6 @@ export const toys: Toy[] = [
     title: "Slop machine",
     blurb: "Paste a sentence, get it back as LinkedIn bait.",
     accent: "pink",
-    glyph: "🥫",
     Component: SlopMachine,
   },
 ];
