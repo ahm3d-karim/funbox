@@ -43,3 +43,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# ship hygiene: .env.example MUST stay committable (last match wins)
+!.env.example
