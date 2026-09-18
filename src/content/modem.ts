@@ -41,15 +41,12 @@ export const modemSteps: ModemStep[] = [
 ];
 
 export const karaokeUi = {
-  play: "Play handshake",
   stop: "Stop",
-  again: "Sing it again",
   readingLabel: "Now singing",
   engineNote: "Every tone is synthesized in the browser with WebAudio. There is no audio file in this repo.",
   audioNote: "Browsers block sound until you press play. That is the law, not a bug.",
   toneLabel: "tone",
   hzLabel: "Hz",
-  totalLabel: "run time",
   sourceNote: "Tones are approximations of the published tone plans. Verify at the source; the real handshake varies by modem.",
 };
 
@@ -82,6 +79,4 @@ export const dialPadUi = {
   connect: "Connect",
   backspace: "Delete",
   clear: "Clear",
-  keyHint: "Each press sends the real two-frequency pair for that key",
-  capNote: "Twelve digits is enough for a demo, and enough for the bill.",
 };
