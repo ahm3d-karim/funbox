@@ -104,7 +104,7 @@ export default function Guestbook() {
               onChange={(e) => setName(e.target.value)}
               placeholder={guestbookUi.namePlaceholder}
               maxLength={40}
-              className="min-h-11 rounded-[6px] border border-line bg-bg px-3 text-ink"
+              className="min-h-11 rounded-[6px] border border-ink-dim bg-bg px-3 text-ink"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -114,7 +114,7 @@ export default function Guestbook() {
               onChange={(e) => setMessage(e.target.value)}
               placeholder={guestbookUi.messagePlaceholder}
               rows={3}
-              className="rounded-[6px] border border-line bg-bg p-3 text-ink"
+              className="rounded-[6px] border border-ink-dim bg-bg p-3 text-ink"
             />
           </label>
           <p className="text-xs text-ink-dim">{message.length} / 200</p>
